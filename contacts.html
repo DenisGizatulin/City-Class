@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Контакты - Сити-Класс</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>СИТИ-КЛАСС</h1>
+        <hr>
+        <p>Свяжитесь с нами</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Главная</a></li>
+            <li><a href="catalog.html">Каталог</a></li>
+            <li><a href="contacts.html">Контакты</a></li>
+            <li><a href="login.html">Личный кабинет</a></li>
+            <li><button id="theme-toggle" class="theme-btn">🌙 Тёмная тема</button></li>
+        </ul>
+    </nav>
+
+    <main>
+        <hr>
+        <h2>Напишите нам</h2>
+        <form action="#" method="post">
+            <label for="name">Имя:</label>
+            <input type="text" id="name" name="name" required placeholder="Введите ваше имя">
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required placeholder="example@mail.ru">
+
+            <label for="subject">Тема:</label>
+            <input type="text" id="subject" name="subject" required placeholder="Тема сообщения">
+
+            <label for="source">*Откуда вы о нас узнали?</label>
+            <select id="source" name="source">
+                <option value="internet">Поиск в интернете</option>
+                <option value="friends">От друзей</option>
+                <option value="social">Социальные сети</option>
+            </select>
+
+            <label for="message">Текстовое поле (Сообщение):</label>
+            <textarea id="message" name="message" rows="5" required placeholder="Ваше сообщение..."></textarea>
+
+            <button type="submit">Отправить сообщение</button>
+        </form>
+
+        <hr>
+        <h2>Адрес</h2>
+        <ul>
+            <li><strong>Контактный номер телефона:</strong> +7 (495) 123-45-67</li>
+            <li><strong>Адрес:</strong> г. Москва, ул. Тверская, д. 15</li>
+            <li><strong>Email:</strong> <a href="mailto:info@city-class.ru">info@city-class.ru</a></li>
+        </ul>
+
+        <!-- Фрейм с картой (Требование из задания) -->
+        <h3>Мы на карте:</h3>
+        <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3A3cf2861e6822c60f2fc2bc047b31238de5fb3f93ba919de337194639ab93a1ee&amp;source=constructor" width="100%" height="400" frameborder="0" style="border-radius: 8px;"></iframe>
+        <hr>
+    </main>
+
+    <footer>
+        <hr>
+        <p>&copy; 2026 Сити-Класс. Все права защищены.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
