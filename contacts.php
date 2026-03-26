@@ -1,3 +1,39 @@
+<?php 
+require_once 'db.php'; 
+$message = "";
+
+// Обработка формы отзывов после нажатия кнопки "Опубликовать отзыв"
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['user_name'])) {
+    
+    // Получаем и очищаем данные из формы
+    $name = mysqli_real_escape_string($conn, trim($_POST['user_name']));
+    $product_alias = mysqli_real_escape_string($conn, trim($_POST['product_id']));
+    $rating = isset($_POST['rating']) ? intval($_POST['rating']) : 5;
+    $review_text = mysqli_real_escape_string($conn, trim($_POST['review_text']));
+    
+    // Обрабатываем наш красивый переключатель (Toggle Switch)
+    $recommend = isset($_POST['recommend']) ? 'Да' : 'Нет';
+    
+    // Добавляем информацию о рекомендации прямо в текст отзыва, 
+    // чтобы не менять структуру таблицы в базе данных
+    $final_review_text = "Рекомендует друзьям: " . $recommend . ". Текст отзыва: " . $review_text;
+
+    // Проверяем, что обязательные поля не пустые
+    if (!empty($name) && !empty($review_text)) {
+        // SQL-запрос на вставку данных в таблицу reviews
+        $sql = "INSERT INTO reviews (user_name, product_alias, rating, review_text) 
+                VALUES ('$name', '$product_alias', '$rating', '$final_review_text')";
+        
+        if (mysqli_query($conn, $sql)) {
+            $message = "<div style='color:green; text-align:center; font-weight:bold; font-size: 18px; margin-bottom: 20px; padding: 10px; border: 2px solid green; border-radius: 5px; background: #e8f5e9;'>Спасибо! Ваш отзыв успешно сохранен!</div>";
+        } else {
+            $message = "<div style='color:red; text-align:center; margin-bottom: 20px;'>Ошибка добавления в БД: " . mysqli_error($conn) . "</div>";
+        }
+    } else {
+        $message = "<div style='color:red; text-align:center; margin-bottom: 20px;'>Пожалуйста, заполните все обязательные поля!</div>";
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -9,7 +45,6 @@
 
     <header>
         <h1>СИТИ-КЛАСС</h1>
-        <hr>
         <p>Свяжитесь с нами и оставьте свой отзыв!</p>
     </header>
 
@@ -43,21 +78,25 @@
         <!-- ========================================== -->
         <!-- БЛОК 2: ГОСТЕВАЯ СТРАНИЦА (ФОРМА ОТЗЫВОВ)  -->
         <!-- ========================================== -->
-        <h2 style="text-align: center; width: 100%;">Гостевая страница (Оставьте отзыв)</h2>
+        <h2 style="text-align: center; width: 100%;">Оставьте отзыв</h2>
         <p style="text-align: center; margin-bottom: 30px;">Пожалуйста, заполните форму ниже, чтобы оставить свой отзыв о нашем магазине.</p>
 
+        <!-- БЛОК ВЫВОДА СООБЩЕНИЯ ОТ PHP -->
+        <?php echo $message; ?>
+
         <div class="form-container">
-            <form action="#" method="post">
+            <!-- action указывает на этот же файл для обработки -->
+            <form action="contacts.php" method="post">
                 
                 <!-- 1. Однострочное текстовое поле -->
                 <div class="form-group">
-                    <label class="title" for="name">Ваше имя (Однострочное поле):</label>
+                    <label class="title" for="name">Ваше имя:</label>
                     <input type="text" id="name" name="user_name" required placeholder="Например: Иван Иванов">
                 </div>
 
                 <!-- 2. Раскрывающийся список -->
                 <div class="form-group">
-                    <label class="title" for="product">О каком товаре отзыв? (Раскрывающийся список):</label>
+                    <label class="title" for="product">О каком товаре отзыв?:</label>
                     <select id="product" name="product_id">
                         <option value="oxfords">Мужские туфли «Оксфорды Classic»</option>
                         <option value="redvelvet">Женские туфли «Red Velvet»</option>
@@ -68,7 +107,7 @@
 
                 <!-- 3. Радио кнопка -->
                 <div class="form-group">
-                    <label class="title">Оценка качества (Радио кнопка):</label>
+                    <label class="title">Оценка качества:</label>
                     <div class="radio-checkbox-group">
                         <label><input type="radio" name="rating" value="5" checked> Отлично</label>
                         <label><input type="radio" name="rating" value="4"> Хорошо</label>
@@ -78,7 +117,7 @@
 
                 <!-- 4. Переключатель (Toggle Switch) -->
                 <div class="form-group">
-                    <label class="title">Рекомендовали бы нас друзьям? (Переключатель):</label>
+                    <label class="title">Рекомендовали бы нас друзьям?:</label>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <span style="font-weight: 600;">Нет</span>
                         <label class="switch">
@@ -91,13 +130,13 @@
 
                 <!-- 5. Многострочное текстовое поле -->
                 <div class="form-group">
-                    <label class="title" for="review">Текст отзыва (Многострочное поле):</label>
+                    <label class="title" for="review">Текст отзыва:</label>
                     <textarea id="review" name="review_text" rows="5" required placeholder="Напишите подробный отзыв о товаре или обслуживании..."></textarea>
                 </div>
 
                 <!-- 6. Прокручивающееся текстовое поле -->
                 <div class="form-group">
-                    <label class="title">Правила публикации отзывов (Прокручивающееся поле):</label>
+                    <label class="title">Правила публикации отзывов:</label>
                     <textarea class="scrollable-text" readonly>
 Правила сайта "Сити-Класс":
 1. Запрещена ненормативная лексика.
@@ -114,7 +153,7 @@
                     <div class="radio-checkbox-group">
                         <label style="font-weight: 600; color: #e67e22;">
                             <input type="checkbox" id="agree" name="agree" required>
-                            Я прочитал правила (Флажок)
+                            Я прочитал правила
                         </label>
                     </div>
                 </div>

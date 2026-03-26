@@ -1,14 +1,13 @@
-# Используем официальный образ PHP-FPM (FastCGI Process Manager)
 FROM php:8.2-fpm
 
-# Устанавливаем расширение для работы с базой данных MySQL
-RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
+# Устанавливаем библиотеки для работы с изображениями (GD) и БД
+RUN apt-get update && apt-get install -y \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd mysqli
 
-# Рабочая директория
 WORKDIR /var/www/html
-
-# Копируем код сайта
 COPY . .
-
-# Даем права
 RUN chown -R www-data:www-data /var/www/html

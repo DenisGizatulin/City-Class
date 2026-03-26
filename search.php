@@ -54,7 +54,7 @@
                 $safe_q = mysqli_real_escape_string($l, $search_q);
                 
                 // SQL запрос: ищем совпадения в колонке title_value
-                $sql = "SELECT * FROM title WHERE title_value LIKE '%$safe_q%'";
+                $sql = "SELECT * FROM product WHERE name LIKE '%$safe_q%' OR short_description LIKE '%$safe_q%'";
                 $result = mysqli_query($l, $sql);
 
                 // ЗАДАНИЕ 2: Создаем ассоциированный многомерный массив
