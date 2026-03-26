@@ -25,35 +25,77 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
     require_once 'db.php'; 
 
     // Функция для обработки и обрезки изображения (Исправлен баг с float координатами)
+    // Функция для обработки и обрезки изображения (ВЫСОКОЕ КАЧЕСТВО)
     function processImageBase64($fileArray) {
         if(isset($fileArray) && $fileArray['error'] == 0) {
             $fileTmp = $fileArray['tmp_name'];
-            $imageString = file_get_contents($fileTmp);
-            $sourceImage = @imagecreatefromstring($imageString);
+            
+            // Получаем информацию о типе файла, чтобы правильно его загрузить
+            $imageInfo = getimagesize($fileTmp);
+            if (!$imageInfo) return false; // Если это вообще не картинка
+            $mimeType = $imageInfo['mime'];
+
+            // Загружаем картинку в зависимости от её реального формата
+            switch ($mimeType) {
+                case 'image/jpeg': $sourceImage = @imagecreatefromjpeg($fileTmp); break;
+                case 'image/png':  $sourceImage = @imagecreatefrompng($fileTmp); break;
+                case 'image/webp': $sourceImage = @imagecreatefromwebp($fileTmp); break;
+                default:
+                    $imageString = file_get_contents($fileTmp);
+                    $sourceImage = @imagecreatefromstring($imageString);
+            }
             
             if ($sourceImage !== false) {
                 $width = imagesx($sourceImage);
                 $height = imagesy($sourceImage);
-                $newSize = 500; // Единый размер фото
+                
+                // УВЕЛИЧЕНО РАЗРЕШЕНИЕ: теперь 800x800 пикселей для максимальной четкости
+                $newSize = 800; 
 
                 $minSize = min($width, $height);
-                
-                // ИСПРАВЛЕНИЕ: Добавлен intval() для PHP 8.1+
                 $cropStartX = intval(($width - $minSize) / 2);
                 $cropStartY = intval(($height - $minSize) / 2);
 
                 $newImage = imagecreatetruecolor($newSize, $newSize);
+                
+                // Сохраняем прозрачность для PNG, если вдруг загрузят фото без фона
+                if ($mimeType == 'image/png') {
+                    imagealphablending($newImage, false);
+                    imagesavealpha($newImage, true);
+                    $transparent = imagecolorallocatealpha($newImage, 255, 255, 255, 127);
+                    imagefilledrectangle($newImage, 0, 0, $newSize, $newSize, $transparent);
+                } else {
+                    // Для JPEG делаем белый фон по умолчанию (а не черный)
+                    $white = imagecolorallocate($newImage, 255, 255, 255);
+                    imagefill($newImage, 0, 0, $white);
+                }
+
+                // Включаем сглаживание для четких границ (Антиалиасинг)
+                imageantialias($newImage, true);
+
+                // Копируем и обрезаем
                 imagecopyresampled($newImage, $sourceImage, 0, 0, $cropStartX, $cropStartY, $newSize, $newSize, $minSize, $minSize);
                 
+                // Сохраняем в буфер
                 ob_start();
-                imagejpeg($newImage, null, 85);
-                $imageData = ob_get_contents();
+                
+                // Если исходник PNG - сохраняем как PNG без потери качества, иначе как JPEG 100%
+                if ($mimeType == 'image/png') {
+                    imagepng($newImage, null, 0); // Максимальное качество PNG
+                    $imageData = ob_get_contents();
+                    $base64Image = 'data:image/png;base64,' . base64_encode($imageData);
+                } else {
+                    imagejpeg($newImage, null, 100); // 100% КАЧЕСТВО JPEG
+                    $imageData = ob_get_contents();
+                    $base64Image = 'data:image/jpeg;base64,' . base64_encode($imageData);
+                }
+                
                 ob_end_clean();
                 
                 imagedestroy($sourceImage);
                 imagedestroy($newImage);
 
-                return 'data:image/jpeg;base64,' . base64_encode($imageData);
+                return $base64Image;
             }
         }
         return false;

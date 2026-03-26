@@ -34,73 +34,13 @@ header {
 header h1 { margin: 0; font-size: 2.5em; letter-spacing: 2px;}
 header p { color: #e67e22; font-weight: 600; margin-top: 5px; }
 
-/* --- Сетка каталога --- */
-.catalog-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px; /* Увеличен отступ между карточками по вертикали и горизонтали */
-    justify-content: center;
-}
-
-.product-card {
-    border: 1px solid #eee;
-    padding: 20px;
-    text-align: center;
-    width: 28%; /* Чуть уже, чтобы лучше смотрелись */
-    min-width: 280px;
-    border-radius: 8px;
-    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background-color: #fff;
-    margin-bottom: 20px; /* Отступ снизу для визуального разделения рядов */
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    border-color: #e67e22;
-}
-
-.product-card img {
-    width: 100%;
-    max-height: 220px; /* Картинки теперь меньше и аккуратнее */
-    object-fit: contain; /* Картинка полностью вписывается без обрезки */
-    border-radius: 5px;
-    margin-bottom: 15px;
-}
-
-.product-card h3 { margin: 10px 0; font-size: 1.2em; color: #2c3e50; }
-.product-card p { font-size: 0.9em; color: #7f8c8d; line-height: 1.4; flex-grow: 1; }
-.product-card h4 { font-size: 1.4em; color: #e67e22; margin: 15px 0; }
-
-/* Кнопка "Подробнее" в каталоге */
-.btn-details {
-    width: 100%;
-    padding: 12px;
-    background-color: #2c3e50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 1em;
-    text-transform: uppercase;
-    transition: background-color 0.3s;
-    margin-top: auto; /* Прижимает кнопку к низу карточки */
-}
-.btn-details:hover { background-color: #e67e22; }
-
-/* ========================================================== */
-/* ПУНКТ 8: Навигационное меню, используя стили CSS           */
-/* ========================================================== */
+/* --- Навигационное меню --- */
 nav {
     background-color: #2c3e50;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 nav ul {
-    list-style-type: none; /* Убираем стандартные маркеры */
+    list-style-type: none;
     text-align: center;
     margin: 0;
     padding: 15px 0;
@@ -130,7 +70,6 @@ nav ul li a:hover {
     transform: translateY(-2px);
 }
 
-/* Кнопка смены темы в меню */
 .theme-btn {
     background: transparent;
     border: 2px solid #e67e22;
@@ -144,136 +83,216 @@ nav ul li a:hover {
 }
 .theme-btn:hover { background-color: #e67e22; }
 
-/* Заголовки */
 h2 { color: #2c3e50; border-bottom: 2px solid #e67e22; padding-bottom: 5px; display: inline-block;}
 hr { border: 0; height: 1px; background: #eee; margin: 20px 0; }
 
 /* ========================================================== */
-/* ПУНКТЫ 6 и 7: Стили для всех видов элементов ФОРМ          */
+/* СЕТКА КАТАЛОГА — КРАСИВАЯ И СОВРЕМЕННАЯ                    */
 /* ========================================================== */
-.form-container {
-    background-color: #fdfdfd;
-    padding: 25px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    max-width: 700px;
-    margin: 0 auto;
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 35px;
+    justify-content: center;
+    padding: 20px 0;
 }
-.form-group {
+
+.product-card {
+    border: 1px solid #eee;
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: #fff;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.product-card:hover {
+    transform: translateY(-12px) scale(1.03);
+    box-shadow: 0 20px 40px rgba(230, 126, 34, 0.15);
+    border-color: #e67e22;
+}
+
+/* Красивая картинка */
+.product-card img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 20px auto 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.4s ease;
+}
+
+.product-card:hover img {
+    transform: scale(1.08);
+}
+
+/* Текст внутри карточки */
+.product-card h3 {
+    margin: 0 20px 8px;
+    font-size: 1.35em;
+    color: #2c3e50;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.product-card p {
+    margin: 0 20px 15px;
+    font-size: 0.95em;
+    color: #7f8c8d;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.product-card h4 {
+    margin: 0 20px 20px;
+    font-size: 1.55em;
+    font-weight: 700;
+    color: #e67e22;
+}
+
+/* Красивая кнопка */
+.btn-details {
+    margin: 0 20px 25px;
+    padding: 14px 24px;
+    background: linear-gradient(90deg, #e67e22, #d35400);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.05em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 15px rgba(230, 126, 34, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-details:hover {
+    background: linear-gradient(90deg, #d35400, #e67e22);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(230, 126, 34, 0.4);
+}
+
+.btn-details:active {
+    transform: scale(0.95);
+}
+
+/* ========================================================== */
+/* СТРАНИЦА ТОВАРА (product.php)                              */
+/* ========================================================== */
+
+/* Контейнер картинки на странице товара */
+.product-image-container {
+    text-align: center;
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px; /* Ограничиваем блок слева */
+}
+
+/* ЖЕСТКОЕ ОГРАНИЧЕНИЕ КАРТИНКИ НА СТРАНИЦЕ ТОВАРА */
+.product-image-container img {
+    width: 320px; /* Небольшой, строгий размер */
+    height: 320px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 4px solid #e67e22; /* Требование ЛР */
+    cursor: zoom-in;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+}
+.product-image-container img:hover {
+    transform: scale(1.03); /* Легкое увеличение при наведении */
+}
+
+.product-page h3 {
+    color: black;
+    font-size: 18px;
+    font-weight: 400;
+    background-color: #eaeaea;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 25px;
+}
+.short-desc {
+    color: #707070;
+    font-size: 14px;
+    font-style: italic;
+    line-height: 16px;
     margin-bottom: 20px;
 }
-.form-group label.title {
-    display: block;
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 8px;
-}
-
-/* Однострочные текстовые поля, пароли, списки */
-input[type="text"], input[type="email"], input[type="password"], select {
-    width: 100%;
-    height: 45px;
-    color: #333;
-    font-size: 15px;
-    padding: 0 15px;
-    border: 1px solid #bdc3c7;
-    border-radius: 5px;
-    box-sizing: border-box;
-    font-family: inherit;
-}
-
-/* Многострочное текстовое поле */
-textarea {
-    width: 100%;
-    color: #333;
-    font-size: 15px;
-    padding: 15px;
-    border: 1px solid #bdc3c7;
-    border-radius: 5px;
-    box-sizing: border-box;
-    font-family: inherit;
-    resize: vertical;
-}
-
-/* Прокручивающееся текстовое поле (Скролл) */
-.scrollable-text {
-    height: 100px;
-    overflow-y: scroll; /* Включает вертикальную прокрутку */
-    background-color: #f1f1f1;
-    color: #555;
-    font-size: 14px;
-    cursor: not-allowed;
-}
-
-/* Радиокнопки и Флажки (Чекбоксы) */
-.radio-checkbox-group {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-}
-.radio-checkbox-group label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
+.detailed-desc {
+    color: #484343;
+    font-size: 16px;
     font-weight: 400;
+    line-height: 24px;
+    text-align: left;
 }
-input[type="radio"], input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
+.char-list {
+    background-color: #fcfcfc;
+    padding: 15px 15px 15px 35px;
+    border-left: 3px solid #e67e22;
+    list-style-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23e67e22" viewBox="0 0 16 16"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/></svg>');
 }
+.char-list li { margin-bottom: 8px; color: #2c3e50; }
 
-/* Переключатель (Toggle Switch) на чистом CSS */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 26px;
+/* --- Таблицы с горизонтальной прокруткой --- */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin: 20px 0;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
 }
+table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+    font-size: 1em;
+    text-align: center;
+    background-color: #fff;
+}
+table th { background-color: #2c3e50; color: #ffffff; padding: 15px; font-weight: 600; white-space: nowrap; }
+table td { padding: 12px 15px; border-bottom: 1px solid #dddddd; color: #333;}
+table tbody tr:nth-of-type(even) { background-color: #f8f9fa; }
+table tbody tr:last-of-type { border-bottom: 2px solid #e67e22; }
+table tbody tr:hover { background-color: #f1f1f1; transition: background-color 0.3s ease; }
+
+/* ========================================================== */
+/* СТИЛИ ФОРМ                                                 */
+/* ========================================================== */
+.form-container { background-color: #fdfdfd; padding: 25px; border: 1px solid #eee; border-radius: 8px; max-width: 700px; margin: 0 auto; }
+.form-group { margin-bottom: 20px; }
+.form-group label.title { display: block; font-weight: 600; color: #2c3e50; margin-bottom: 8px; }
+
+input[type="text"], input[type="number"], input[type="email"], input[type="password"], select {
+    width: 100%; height: 45px; color: #333; font-size: 15px; padding: 0 15px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-family: inherit;
+}
+textarea { width: 100%; color: #333; font-size: 15px; padding: 15px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-family: inherit; resize: vertical; }
+
+.scrollable-text { height: 100px; overflow-y: scroll; background-color: #f1f1f1; color: #555; font-size: 14px; cursor: not-allowed; }
+
+.radio-checkbox-group { display: flex; gap: 20px; align-items: center; }
+.radio-checkbox-group label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 400; }
+input[type="radio"], input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+/* Переключатель (Toggle Switch) */
+.switch { position: relative; display: inline-block; width: 50px; height: 26px; }
 .switch input { opacity: 0; width: 0; height: 0; }
-.slider {
-    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccc; transition: .4s; border-radius: 26px;
-}
-.slider:before {
-    position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px;
-    background-color: white; transition: .4s; border-radius: 50%;
-}
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
 input:checked + .slider { background-color: #e67e22; }
 input:checked + .slider:before { transform: translateX(24px); }
 
-/* Кнопка отправки данных */
-button[type="submit"] {
-    width: 100%;
-    padding: 15px;
-    background-color: #e67e22;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    text-transform: uppercase;
-    transition: background-color 0.3s;
-}
+button[type="submit"] { width: 100%; padding: 15px; background-color: #e67e22; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; text-transform: uppercase; transition: background-color 0.3s; }
 button[type="submit"]:hover { background-color: #d35400; }
 
-/* --- Сетка для страницы Авторизации/Регистрации --- */
-.auth-grid {
-    display: flex;
-    gap: 30px;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-.auth-box {
-    flex: 1;
-    min-width: 300px;
-    background: #fdfdfd;
-    padding: 25px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-}
+.auth-grid { display: flex; gap: 30px; justify-content: space-between; flex-wrap: wrap; }
+.auth-box { flex: 1; min-width: 300px; background: #fdfdfd; padding: 25px; border: 1px solid #eee; border-radius: 8px; }
 .auth-box h3 { margin-top: 0; color: #2c3e50; text-align: center; }
 
 /* Подвал */
@@ -285,10 +304,15 @@ footer { background-color: #1a252f; color: #ccc; text-align: center; padding: 20
 body.dark-theme { background-color: #121212; color: #e0e0e0; }
 body.dark-theme main { background-color: #1e1e1e; border-color: #333; box-shadow: none;}
 body.dark-theme h2, body.dark-theme .auth-box h3, body.dark-theme .form-group label.title { color: #ffffff; }
-body.dark-theme .form-container, body.dark-theme .auth-box { background-color: #252525; border-color: #444; }
-body.dark-theme input[type="text"], body.dark-theme input[type="email"], body.dark-theme input[type="password"], 
-body.dark-theme select, body.dark-theme textarea {
-    background-color: #333; color: #fff; border-color: #555;
-}
+body.dark-theme .product-card, body.dark-theme .form-container, body.dark-theme .auth-box { background-color: #252525; border-color: #444; }
+body.dark-theme .product-page h3 { background-color: #333; color: #fff;}
+body.dark-theme .short-desc { color: #aaa; }
+body.dark-theme .detailed-desc { color: #ddd; }
+body.dark-theme .char-list { background-color: #2a2a2a; color: #ddd;}
+body.dark-theme .char-list li { color: #ddd; }
+body.dark-theme table { background-color: #1e1e1e; }
+body.dark-theme table td { border-bottom: 1px solid #333; color: #e0e0e0; }
+body.dark-theme table tbody tr:nth-of-type(even) { background-color: #2a2a2a; }
+body.dark-theme table tbody tr:hover { background-color: #333; }
+body.dark-theme input[type="text"], body.dark-theme input[type="number"], body.dark-theme input[type="email"], body.dark-theme input[type="password"], body.dark-theme select, body.dark-theme textarea { background-color: #333; color: #fff; border-color: #555; }
 body.dark-theme .scrollable-text { background-color: #222; color: #ccc; }
-
