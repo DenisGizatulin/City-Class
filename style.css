@@ -155,7 +155,6 @@ hr { border: 0; height: 1px; background: #eee; margin: 20px 0; }
 
 /* Красивая кнопка */
 .btn-details {
-    margin: 0 20px 25px;
     padding: 14px 24px;
     background: linear-gradient(90deg, #e67e22, #d35400);
     color: white;

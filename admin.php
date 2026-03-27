@@ -24,7 +24,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login_admin'])) {
 if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
     require_once 'db.php'; 
 
-    // Функция для обработки и обрезки изображения (Исправлен баг с float координатами)
     // Функция для обработки и обрезки изображения (ВЫСОКОЕ КАЧЕСТВО)
     function processImageBase64($fileArray) {
         if(isset($fileArray) && $fileArray['error'] == 0) {
@@ -49,7 +48,6 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
                 $width = imagesx($sourceImage);
                 $height = imagesy($sourceImage);
                 
-                // УВЕЛИЧЕНО РАЗРЕШЕНИЕ: теперь 800x800 пикселей для максимальной четкости
                 $newSize = 800; 
 
                 $minSize = min($width, $height);
@@ -58,38 +56,29 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
 
                 $newImage = imagecreatetruecolor($newSize, $newSize);
                 
-                // Сохраняем прозрачность для PNG, если вдруг загрузят фото без фона
                 if ($mimeType == 'image/png') {
                     imagealphablending($newImage, false);
                     imagesavealpha($newImage, true);
                     $transparent = imagecolorallocatealpha($newImage, 255, 255, 255, 127);
                     imagefilledrectangle($newImage, 0, 0, $newSize, $newSize, $transparent);
                 } else {
-                    // Для JPEG делаем белый фон по умолчанию (а не черный)
                     $white = imagecolorallocate($newImage, 255, 255, 255);
                     imagefill($newImage, 0, 0, $white);
                 }
 
-                // Включаем сглаживание для четких границ (Антиалиасинг)
                 imageantialias($newImage, true);
-
-                // Копируем и обрезаем
                 imagecopyresampled($newImage, $sourceImage, 0, 0, $cropStartX, $cropStartY, $newSize, $newSize, $minSize, $minSize);
                 
-                // Сохраняем в буфер
                 ob_start();
-                
-                // Если исходник PNG - сохраняем как PNG без потери качества, иначе как JPEG 100%
                 if ($mimeType == 'image/png') {
-                    imagepng($newImage, null, 0); // Максимальное качество PNG
+                    imagepng($newImage, null, 0);
                     $imageData = ob_get_contents();
                     $base64Image = 'data:image/png;base64,' . base64_encode($imageData);
                 } else {
-                    imagejpeg($newImage, null, 100); // 100% КАЧЕСТВО JPEG
+                    imagejpeg($newImage, null, 100);
                     $imageData = ob_get_contents();
                     $base64Image = 'data:image/jpeg;base64,' . base64_encode($imageData);
                 }
-                
                 ob_end_clean();
                 
                 imagedestroy($sourceImage);
@@ -102,18 +91,40 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
     }
 
     // =======================================================
-    // 1. ОБРАБОТКА ДОБАВЛЕНИЯ ТОВАРА
+    // 1. ОБРАБОТКА ДОБАВЛЕНИЯ ТОВАРА (с валидацией)
     // =======================================================
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
-        $name = mysqli_real_escape_string($conn, trim($_POST['name']));
-        $alias = mysqli_real_escape_string($conn, trim($_POST['alias']));
-        $price = floatval($_POST['price']);
-        $short_desc = mysqli_real_escape_string($conn, trim($_POST['short_desc']));
-        $desc = mysqli_real_escape_string($conn, trim($_POST['desc']));
+        $errors = [];
         
-        $base64Image = processImageBase64($_FILES['image']);
+        $name = trim($_POST['name']);
+        $alias = trim($_POST['alias']);
+        $price = floatval($_POST['price']);
+        $short_desc = trim($_POST['short_desc']);
+        $desc = trim($_POST['desc']);
+        
+        // Проверка обязательных полей
+        if (empty($name)) $errors[] = "Название товара не может быть пустым.";
+        if (empty($alias)) $errors[] = "Алиас (url-имя) не может быть пустым.";
+        if ($price <= 0) $errors[] = "Цена должна быть положительным числом.";
+        if (empty($short_desc)) $errors[] = "Краткое описание обязательно.";
+        if (empty($desc)) $errors[] = "Подробное описание обязательно.";
+        
+        // Проверка изображения
+        if (!isset($_FILES['image']) || $_FILES['image']['error'] != 0) {
+            $errors[] = "Фото товара обязательно для загрузки.";
+        } else {
+            $base64Image = processImageBase64($_FILES['image']);
+            if (!$base64Image) {
+                $errors[] = "Некорректный файл изображения. Поддерживаются JPEG, PNG, WEBP.";
+            }
+        }
 
-        if (!empty($name) && !empty($price) && $base64Image) {
+        if (empty($errors)) {
+            $name = mysqli_real_escape_string($conn, $name);
+            $alias = mysqli_real_escape_string($conn, $alias);
+            $short_desc = mysqli_real_escape_string($conn, $short_desc);
+            $desc = mysqli_real_escape_string($conn, $desc);
+            
             $sql = "INSERT INTO product (name, alias, price, short_description, description, image) 
                     VALUES ('$name', '$alias', '$price', '$short_desc', '$desc', '$base64Image')";
             if (mysqli_query($conn, $sql)) {
@@ -122,34 +133,53 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
                 $db_error = mysqli_error($conn);
             }
         } else {
-            $db_error = "Заполните все поля и прикрепите корректную картинку!";
+            $db_error = implode("<br>", $errors);
         }
     }
 
     // =======================================================
-    // 2. ОБРАБОТКА РЕДАКТИРОВАНИЯ ТОВАРА
+    // 2. ОБРАБОТКА РЕДАКТИРОВАНИЯ ТОВАРА (с валидацией)
     // =======================================================
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_product'])) {
         $id = intval($_POST['product_id']);
-        $name = mysqli_real_escape_string($conn, trim($_POST['name']));
-        $alias = mysqli_real_escape_string($conn, trim($_POST['alias']));
-        $price = floatval($_POST['price']);
-        $short_desc = mysqli_real_escape_string($conn, trim($_POST['short_desc']));
-        $desc = mysqli_real_escape_string($conn, trim($_POST['desc']));
+        $errors = [];
         
-        $imageSql = ""; 
-        $base64Image = processImageBase64($_FILES['image']);
-        if ($base64Image) {
-            $imageSql = ", image = '$base64Image'";
+        $name = trim($_POST['name']);
+        $alias = trim($_POST['alias']);
+        $price = floatval($_POST['price']);
+        $short_desc = trim($_POST['short_desc']);
+        $desc = trim($_POST['desc']);
+        
+        if (empty($name)) $errors[] = "Название товара не может быть пустым.";
+        if (empty($alias)) $errors[] = "Алиас (url-имя) не может быть пустым.";
+        if ($price <= 0) $errors[] = "Цена должна быть положительным числом.";
+        if (empty($short_desc)) $errors[] = "Краткое описание обязательно.";
+        if (empty($desc)) $errors[] = "Подробное описание обязательно.";
+        
+        $imageSql = "";
+        if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+            $base64Image = processImageBase64($_FILES['image']);
+            if ($base64Image) {
+                $imageSql = ", image = '$base64Image'";
+            } else {
+                $errors[] = "Загруженный файл не является корректным изображением. Изменение фото отменено.";
+            }
         }
 
-        if (!empty($name) && !empty($price)) {
+        if (empty($errors)) {
+            $name = mysqli_real_escape_string($conn, $name);
+            $alias = mysqli_real_escape_string($conn, $alias);
+            $short_desc = mysqli_real_escape_string($conn, $short_desc);
+            $desc = mysqli_real_escape_string($conn, $desc);
+            
             $sql = "UPDATE product SET name='$name', alias='$alias', price='$price', short_description='$short_desc', description='$desc' $imageSql WHERE id=$id";
             if (mysqli_query($conn, $sql)) {
                 $success_msg = "Товар успешно обновлен!";
             } else {
                 $db_error = mysqli_error($conn);
             }
+        } else {
+            $db_error = implode("<br>", $errors);
         }
     }
 
@@ -230,7 +260,7 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
                         <input type="text" name="alias" value="<?= htmlspecialchars($prod['alias']) ?>" required></div>
                         
                         <div class="form-group"><label class="title">Цена (руб):</label>
-                        <input type="number" step="0.01" name="price" value="<?= $prod['price'] ?>" required></div>
+                        <input type="number" step="0.01" name="price" value="<?= $prod['price'] ?>" required min="0.01"></div>
                         
                         <div class="form-group" style="background:#f9f9f9; padding:15px; border-radius:5px; border:1px dashed #ccc;">
                             <label class="title">Новое фото товара (Оставьте пустым, чтобы сохранить текущее):</label>
@@ -262,8 +292,8 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
                         <input type="hidden" name="add_product" value="1">
                         <div class="form-group"><label class="title">Название:</label><input type="text" name="name" required></div>
                         <div class="form-group"><label class="title">Алиас (url-имя):</label><input type="text" name="alias" required placeholder="primer-tovara"></div>
-                        <div class="form-group"><label class="title">Цена (руб):</label><input type="number" step="0.01" name="price" required></div>
-                        <div class="form-group"><label class="title">Фото товара (будет обрезано 500x500):</label><input type="file" name="image" accept="image/*" required style="padding-top: 10px;"></div>
+                        <div class="form-group"><label class="title">Цена (руб):</label><input type="number" step="0.01" name="price" required min="0.01"></div>
+                        <div class="form-group"><label class="title">Фото товара (будет обрезано 800x800):</label><input type="file" name="image" accept="image/*" required style="padding-top: 10px;"></div>
                         <div class="form-group"><label class="title">Краткое описание (в каталог):</label><textarea name="short_desc" rows="2" required></textarea></div>
                         <div class="form-group"><label class="title">ПОДРОБНОЕ описание (на страницу товара):</label><textarea name="desc" rows="6" required></textarea></div>
                         <button type="submit">➕ Добавить товар в БД</button>
@@ -314,7 +344,7 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
                                             <a href='admin.php?action=edit&id={$row['id']}' style='color:#2980b9; font-weight:bold; margin-right:10px; text-decoration:none;'>✏️ Редакт.</a>
                                             <a href='admin.php?action=delete&id={$row['id']}' onclick=\"return confirm('Вы точно хотите удалить этот товар?');\" style='color:#c0392b; font-weight:bold; text-decoration:none;'>❌ Удал.</a>
                                         </td>
-                                      </tr>";
+                                       </tr>";
                             }
                         } else {
                             echo "<tr><td colspan='5'>В базе данных пока нет товаров.</td></tr>";

@@ -73,6 +73,30 @@
         footer {
             margin-top: 40px;
         }
+
+        /* Панель сортировки */
+        .sort-panel {
+            margin: 20px 0;
+            text-align: right;
+            font-size: 0.9em;
+        }
+        .sort-panel a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        .sort-panel a:hover {
+            background-color: #e67e22;
+            color: white;
+        }
+        .sort-panel .active {
+            background-color: #e67e22;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -96,9 +120,37 @@
         <hr>
         <h2>Каталог товаров</h2>
         
+        <!-- Панель сортировки -->
+        <div class="sort-panel">
+            Сортировать: 
+            <a href="?sort=name_asc" <?= (isset($_GET['sort']) && $_GET['sort'] == 'name_asc') ? 'class="active"' : '' ?>>По названию (А-Я)</a>
+            <a href="?sort=name_desc" <?= (isset($_GET['sort']) && $_GET['sort'] == 'name_desc') ? 'class="active"' : '' ?>>По названию (Я-А)</a>
+            <a href="?sort=price_asc" <?= (isset($_GET['sort']) && $_GET['sort'] == 'price_asc') ? 'class="active"' : '' ?>>Цена (возр.)</a>
+            <a href="?sort=price_desc" <?= (isset($_GET['sort']) && $_GET['sort'] == 'price_desc') ? 'class="active"' : '' ?>>Цена (убыв.)</a>
+            <a href="catalog.php" <?= (!isset($_GET['sort'])) ? 'class="active"' : '' ?>>По умолчанию (новинки)</a>
+        </div>
+        
         <div class="catalog-grid">
             <?php
-            $result = mysqli_query($conn, "SELECT * FROM product ORDER BY id DESC");
+            // Определяем порядок сортировки в зависимости от GET-параметра
+            $order_by = "id DESC"; // по умолчанию — новые товары
+            if (isset($_GET['sort'])) {
+                switch ($_GET['sort']) {
+                    case 'name_asc':
+                        $order_by = "name ASC";
+                        break;
+                    case 'name_desc':
+                        $order_by = "name DESC";
+                        break;
+                    case 'price_asc':
+                        $order_by = "price ASC";
+                        break;
+                    case 'price_desc':
+                        $order_by = "price DESC";
+                        break;
+                }
+            }
+            $result = mysqli_query($conn, "SELECT * FROM product ORDER BY $order_by");
             
             if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
