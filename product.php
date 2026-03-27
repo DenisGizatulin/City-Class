@@ -80,30 +80,6 @@ elseif (strpos($name_lower, 'женск') !== false || strpos($name_lower, 'ту
         <!-- Функция nl2br сохраняет абзацы, введенные в админке -->
         <p class="detailed-desc"><?= nl2br(htmlspecialchars($product['description'])) ?></p>
 
-        <h3>Подробная таблица размеров</h3>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr><th>Длина стопы (см)</th><th>Россия (RU)</th><th>Европа (EU)</th><th>США (US)</th><th>Англия (UK)</th></tr>
-                </thead>
-                <tbody>
-                    <?php if ($table_type == 'mens'): ?>
-                        <tr><td>26.5</td><td>40</td><td>41</td><td>8</td><td>7</td></tr>
-                        <tr><td>28.5</td><td>42</td><td>43</td><td>10</td><td>9</td></tr>
-                        <tr><td>30.5</td><td>44</td><td>45</td><td>12</td><td>11</td></tr>
-                    <?php elseif ($table_type == 'womens'): ?>
-                        <tr><td>22.5</td><td>35</td><td>36</td><td>5</td><td>3</td></tr>
-                        <tr><td>23.5</td><td>37</td><td>38</td><td>7</td><td>5</td></tr>
-                        <tr><td>25.0</td><td>39</td><td>40</td><td>9</td><td>7</td></tr>
-                    <?php elseif ($table_type == 'sport'): ?>
-                        <tr><td>24.0</td><td>37</td><td>38</td><td>6</td><td>5.5</td></tr>
-                        <tr><td>26.5</td><td>40</td><td>41</td><td>8.5</td><td>7.5</td></tr>
-                        <tr><td>28.0</td><td>42</td><td>43</td><td>10</td><td>9</td></tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-
         <h3>* Особенности ухода</h3>
         <ol style="color: #484343; line-height: 1.8; margin-bottom: 30px;">
             <li>После каждой носки очищайте обувь сухой щеткой.</li>
