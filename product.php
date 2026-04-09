@@ -67,9 +67,21 @@ elseif (strpos($name_lower, 'женск') !== false || strpos($name_lower, 'ту
                     <li><strong>Наличие:</strong> <?= $product['available'] ? '<span style="color:green;">В наличии на складе</span>' : '<span style="color:red;">Нет в наличии</span>' ?></li>
                 </ul>
 
-                <button style="width:100%; padding:15px; background-color:#27ae60; color:white; border:none; border-radius:5px; cursor:pointer; font-size:18px; font-weight:bold; margin-top:20px; transition: 0.3s;">
-                    🛒 ДОБАВИТЬ В КОРЗИНУ
-                </button>
+                <!-- БЛОК ДЛЯ ДОБАВЛЕНИЯ В КОРЗИНУ (аналогично каталогу) -->
+                <div class="card" style="background-color: #fcfcfc; padding: 20px; border-left: 4px solid #27ae60; margin: 30px 0; border-radius: 4px; display: flex; align-items: center; justify-content: space-between;">
+                    <!-- Скрытые поля для передачи данных в JS Корзину -->
+                    <div class="card__image" style="display:none;"><img src="<?= $product['image'] ?>" alt="<?= htmlspecialchars($product['name']) ?>"></div>
+                    <div class="card__title" style="display:none;"><?= htmlspecialchars($product['name']) ?></div>
+                    <div class="card__price--discount" style="display:none;"><?= number_format($product['price'], 0, ',', ' ') ?> руб.</div>
+                    
+                    <div>
+                        <span style="font-size: 1.2em; color: #2c3e50; font-weight: 600;">Цена:</span>
+                        <span class="card__price--common" style="font-size: 2em; color: #27ae60; font-weight: bold; margin-left: 15px;"><?= number_format($product['price'], 0, ',', ' ') ?> руб.</span>
+                    </div>
+                    
+                    <!-- Кнопка добавления в корзину -->
+                    <button class="card__add" style="padding: 12px 30px; background-color: #27ae60; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; transition: background 0.3s;">В корзину 🛒</button>
+                </div>
             </div>
         </div>
 
@@ -77,7 +89,6 @@ elseif (strpos($name_lower, 'женск') !== false || strpos($name_lower, 'ту
 
         <!-- ПОДРОБНОЕ ОПИСАНИЕ ИЗ БАЗЫ ДАННЫХ -->
         <h3>Подробное описание товара</h3>
-        <!-- Функция nl2br сохраняет абзацы, введенные в админке -->
         <p class="detailed-desc"><?= nl2br(htmlspecialchars($product['description'])) ?></p>
 
         <h3>* Особенности ухода</h3>
@@ -86,11 +97,18 @@ elseif (strpos($name_lower, 'женск') !== false || strpos($name_lower, 'ту
             <li>Используйте формодержатели для сохранения формы.</li>
             <li>Сушить только естественным путем вдали от батарей.</li>
         </ol>
-
     </main>
+
+    <!-- КНОПКА И ОКНО КОРЗИНЫ -->
+    <button class="cart" id="cart" title="Корзина"><span style="font-size: 24px;">🛒</span><div class="cart__num" id="cart_num">0</div></button>
+    <div class="popup"><div class="popup__container" id="popup_container"><button class="popup__close" id="popup_close">✖</button><div class="popup__item"><h1 class="popup__title">Оформление заказа</h1></div><div class="popup__item" id="popup_product_list"></div><div class="popup__item"><div class="popup__cost"><h2 class="popup__cost-title">Итого к оплате:</h2><output class="popup__cost-value" id="popup_cost_discount">0</output></div><button style="width: 100%; margin-top: 15px; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 18px;">ОПЛАТИТЬ ЗАКАЗ</button></div></div></div>
 
     <footer style="position: relative;">
         <p>&copy; 2026 Сити-Класс. Все права защищены.</p>
+        <p style="font-size: 12px; margin-top: 10px;">
+            <a href="#" onclick="openPrivacyPolicy(); return false;" style="color: #e67e22;">Читать Политику конфиденциальности (Окно)</a> | 
+            <a href="privacy.txt" download style="color: #3498db;">Скачать Политику (TXT)</a>
+        </p>
         <a href="admin.php" title="Панель администратора" style="position: absolute; right: 20px; bottom: 20px; color: #555; text-decoration: none; font-size: 14px; opacity: 0.5; transition: opacity 0.3s;">⚙️ Админ</a>
     </footer>
 

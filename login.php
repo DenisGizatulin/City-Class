@@ -56,6 +56,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
             </div>
         </div>
     </main>
+    <footer>
+        <p>&copy; 2026 Сити-Класс. Все права защищены.</p>
+        <p style="font-size: 12px; margin-top: 10px;">
+            <a href="#" onclick="openPrivacyPolicy(); return false;" style="color: #e67e22;">Читать Политику конфиденциальности (Окно)</a> | 
+            <a href="privacy.txt" download style="color: #3498db;">Скачать Политику (TXT)</a>
+        </p>
+    </footer>
     <script src="script.js"></script>
 </body>
 </html>

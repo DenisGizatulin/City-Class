@@ -356,6 +356,15 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
 
         <?php endif; ?>
     </main>
+    
+    <footer style="position: relative;">
+        <p>&copy; 2026 Сити-Класс. Все права защищены.</p>
+        <p style="font-size: 12px; margin-top: 10px;">
+            <a href="#" onclick="openPrivacyPolicy(); return false;" style="color: #e67e22;">Читать Политику конфиденциальности (Окно)</a> | 
+            <a href="privacy.txt" download style="color: #3498db;">Скачать Политику (TXT)</a>
+        </p>
+    </footer>
+    
     <script src="script.js"></script>
 </body>
 </html>
