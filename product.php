@@ -64,7 +64,13 @@ elseif (strpos($name_lower, 'женск') !== false || strpos($name_lower, 'ту
                 <ul class="char-list">
                     <li><strong>Артикул в базе (ID):</strong> <?= $product['id'] ?></li>
                     <li><strong>Алиас (url):</strong> <?= htmlspecialchars($product['alias']) ?></li>
-                    <li><strong>Наличие:</strong> <?= $product['available'] ? '<span style="color:green;">В наличии на складе</span>' : '<span style="color:red;">Нет в наличии</span>' ?></li>
+                    <li><strong>Наличие:</strong> 
+                        <?php if ($product['available'] > 0): ?>
+                            <span style="color:green;"><?= $product['available'] ?> шт. в наличии</span>
+                        <?php else: ?>
+                            <span style="color:red;">Нет в наличии</span>
+                        <?php endif; ?>
+                    </li>
                 </ul>
 
                 <!-- БЛОК ДЛЯ ДОБАВЛЕНИЯ В КОРЗИНУ (аналогично каталогу) -->
@@ -73,14 +79,20 @@ elseif (strpos($name_lower, 'женск') !== false || strpos($name_lower, 'ту
                     <div class="card__image" style="display:none;"><img src="<?= $product['image'] ?>" alt="<?= htmlspecialchars($product['name']) ?>"></div>
                     <div class="card__title" style="display:none;"><?= htmlspecialchars($product['name']) ?></div>
                     <div class="card__price--discount" style="display:none;"><?= number_format($product['price'], 0, ',', ' ') ?> руб.</div>
+                    <!-- Скрытое поле с доступным количеством -->
+                    <input type="hidden" class="card__available" value="<?= $product['available'] ?>">
                     
                     <div>
                         <span style="font-size: 1.2em; color: #2c3e50; font-weight: 600;">Цена:</span>
                         <span class="card__price--common" style="font-size: 2em; color: #27ae60; font-weight: bold; margin-left: 15px;"><?= number_format($product['price'], 0, ',', ' ') ?> руб.</span>
                     </div>
                     
-                    <!-- Кнопка добавления в корзину -->
-                    <button class="card__add" style="padding: 12px 30px; background-color: #27ae60; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; transition: background 0.3s;">В корзину 🛒</button>
+                    <!-- Кнопка добавления в корзину (активна только если товар в наличии) -->
+                    <?php if ($product['available'] > 0): ?>
+                        <button class="card__add" style="padding: 12px 30px; background-color: #27ae60; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; transition: background 0.3s;">В корзину 🛒</button>
+                    <?php else: ?>
+                        <button disabled style="padding: 12px 30px; background-color: #ccc; color: #666; border: none; border-radius: 5px; font-weight: bold; font-size: 16px;">Нет в наличии</button>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

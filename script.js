@@ -83,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
         body.classList.remove("lock");
     });
 
-    // ИСПРАВЛЕНО: textContent читает текст даже из скрытых блоков (display: none)
     class Product {
         constructor(card) {
             this.imageSrc = card.querySelector(".card__image img").src;
@@ -129,14 +128,50 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = e.target.closest(".card");
             const product = new Product(card);
             
+            // Получаем доступное количество
+            const availableInput = card.querySelector(".card__available");
+            let maxAvailable = null;
+            if (availableInput) {
+                maxAvailable = parseInt(availableInput.value);
+                if (isNaN(maxAvailable)) maxAvailable = null;
+            }
+
+            // Запрашиваем количество
+            let quantity = 1;
+            if (maxAvailable !== null && maxAvailable > 0) {
+                let input = prompt(`Введите количество (доступно: ${maxAvailable} шт.)`, "1");
+                if (input === null) return; // отмена
+                quantity = parseInt(input);
+                if (isNaN(quantity) || quantity <= 0) {
+                    alert("Введите положительное число.");
+                    return;
+                }
+                if (quantity > maxAvailable) {
+                    alert(`Нельзя добавить больше ${maxAvailable} шт.`);
+                    return;
+                }
+            } else {
+                // Если нет информации о наличии, просто спрашиваем количество
+                let input = prompt("Введите количество:", "1");
+                if (input === null) return;
+                quantity = parseInt(input);
+                if (isNaN(quantity) || quantity <= 0) {
+                    alert("Введите положительное число.");
+                    return;
+                }
+            }
+            
             const savedCart = JSON.parse(localStorage.getItem("cart"));
             myCart.products = savedCart.products || [];
             
-            myCart.addProduct(product);
-            localStorage.setItem("cart", JSON.stringify(myCart));
+            // Добавляем товар указанное количество раз
+            for (let i = 0; i < quantity; i++) {
+                myCart.addProduct(product);
+            }
             
+            localStorage.setItem("cart", JSON.stringify(myCart));
             cartNum.textContent = myCart.count;
-            alert("Товар добавлен в корзину!");
+            alert(`Товар добавлен в корзину (${quantity} шт.)!`);
         });
     });
 

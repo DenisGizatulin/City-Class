@@ -99,6 +99,7 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
         $name = trim($_POST['name']);
         $alias = trim($_POST['alias']);
         $price = floatval($_POST['price']);
+        $available = intval($_POST['available']);
         $short_desc = trim($_POST['short_desc']);
         $desc = trim($_POST['desc']);
         
@@ -106,6 +107,7 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
         if (empty($name)) $errors[] = "Название товара не может быть пустым.";
         if (empty($alias)) $errors[] = "Алиас (url-имя) не может быть пустым.";
         if ($price <= 0) $errors[] = "Цена должна быть положительным числом.";
+        if ($available < 0) $errors[] = "Количество не может быть отрицательным.";
         if (empty($short_desc)) $errors[] = "Краткое описание обязательно.";
         if (empty($desc)) $errors[] = "Подробное описание обязательно.";
         
@@ -125,8 +127,8 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
             $short_desc = mysqli_real_escape_string($conn, $short_desc);
             $desc = mysqli_real_escape_string($conn, $desc);
             
-            $sql = "INSERT INTO product (name, alias, price, short_description, description, image) 
-                    VALUES ('$name', '$alias', '$price', '$short_desc', '$desc', '$base64Image')";
+            $sql = "INSERT INTO product (name, alias, price, available, short_description, description, image) 
+                    VALUES ('$name', '$alias', '$price', '$available', '$short_desc', '$desc', '$base64Image')";
             if (mysqli_query($conn, $sql)) {
                 $success_msg = "Товар успешно добавлен!";
             } else {
@@ -147,12 +149,14 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
         $name = trim($_POST['name']);
         $alias = trim($_POST['alias']);
         $price = floatval($_POST['price']);
+        $available = intval($_POST['available']);
         $short_desc = trim($_POST['short_desc']);
         $desc = trim($_POST['desc']);
         
         if (empty($name)) $errors[] = "Название товара не может быть пустым.";
         if (empty($alias)) $errors[] = "Алиас (url-имя) не может быть пустым.";
         if ($price <= 0) $errors[] = "Цена должна быть положительным числом.";
+        if ($available < 0) $errors[] = "Количество не может быть отрицательным.";
         if (empty($short_desc)) $errors[] = "Краткое описание обязательно.";
         if (empty($desc)) $errors[] = "Подробное описание обязательно.";
         
@@ -172,7 +176,7 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
             $short_desc = mysqli_real_escape_string($conn, $short_desc);
             $desc = mysqli_real_escape_string($conn, $desc);
             
-            $sql = "UPDATE product SET name='$name', alias='$alias', price='$price', short_description='$short_desc', description='$desc' $imageSql WHERE id=$id";
+            $sql = "UPDATE product SET name='$name', alias='$alias', price='$price', available='$available', short_description='$short_desc', description='$desc' $imageSql WHERE id=$id";
             if (mysqli_query($conn, $sql)) {
                 $success_msg = "Товар успешно обновлен!";
             } else {
@@ -262,6 +266,9 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
                         <div class="form-group"><label class="title">Цена (руб):</label>
                         <input type="number" step="0.01" name="price" value="<?= $prod['price'] ?>" required min="0.01"></div>
                         
+                        <div class="form-group"><label class="title">Количество в наличии:</label>
+                        <input type="number" name="available" value="<?= $prod['available'] ?>" required min="0"></div>
+                        
                         <div class="form-group" style="background:#f9f9f9; padding:15px; border-radius:5px; border:1px dashed #ccc;">
                             <label class="title">Новое фото товара (Оставьте пустым, чтобы сохранить текущее):</label>
                             <input type="file" name="image" accept="image/*" style="padding-top: 10px; margin-bottom:10px;">
@@ -293,6 +300,7 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
                         <div class="form-group"><label class="title">Название:</label><input type="text" name="name" required></div>
                         <div class="form-group"><label class="title">Алиас (url-имя):</label><input type="text" name="alias" required placeholder="primer-tovara"></div>
                         <div class="form-group"><label class="title">Цена (руб):</label><input type="number" step="0.01" name="price" required min="0.01"></div>
+                        <div class="form-group"><label class="title">Количество в наличии:</label><input type="number" name="available" value="10" required min="0"></div>
                         <div class="form-group"><label class="title">Фото товара (будет обрезано 800x800):</label><input type="file" name="image" accept="image/*" required style="padding-top: 10px;"></div>
                         <div class="form-group"><label class="title">Краткое описание (в каталог):</label><textarea name="short_desc" rows="2" required></textarea></div>
                         <div class="form-group"><label class="title">ПОДРОБНОЕ описание (на страницу товара):</label><textarea name="desc" rows="6" required></textarea></div>
@@ -319,6 +327,7 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
                             <th>Фото</th>
                             <th>Название</th>
                             <th>Цена</th>
+                            <th>В наличии</th>
                             <th>Алиас</th>
                             <th>Действия</th>
                         </tr>
@@ -339,6 +348,7 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
                                         <td><img src='{$row['image']}' style='width:40px; height:40px; border-radius:4px; object-fit:cover;'></td>
                                         <td><strong>{$row['name']}</strong></td>
                                         <td style='color:#e67e22; font-weight:bold;'>{$row['price']} руб.</td>
+                                        <td>{$row['available']} шт.</td>
                                         <td style='color:#7f8c8d;'>{$row['alias']}</td>
                                         <td>
                                             <a href='admin.php?action=edit&id={$row['id']}' style='color:#2980b9; font-weight:bold; margin-right:10px; text-decoration:none;'>✏️ Редакт.</a>
@@ -347,7 +357,7 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
                                        </tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='5'>В базе данных пока нет товаров.</td></tr>";
+                            echo "<tr><td colspan='6'>В базе данных пока нет товаров.</td></tr>";
                         }
                         ?>
                     </tbody>

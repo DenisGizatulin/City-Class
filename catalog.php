@@ -58,7 +58,9 @@
             if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
                     $formatted_price = number_format($row['price'], 0, ',', ' ') . " руб.";
-                    // ДОБАВЛЕНЫ КЛАССЫ ИЗ ЛР 4: card, card__image, card__title, card__price--common, card__add
+                    $available = $row['available'];
+                    $disabled = ($available <= 0) ? 'disabled' : '';
+                    $btnText = ($available > 0) ? 'В КОРЗИНУ 🛒' : 'НЕТ В НАЛИЧИИ';
                     echo "
                     <div class='product-card card'>
                         <div class='card__image'>
@@ -68,11 +70,12 @@
                         <p>{$row['short_description']}</p>
                         
                         <h4 class='card__price--common'>{$formatted_price}</h4>
-                        <!-- Скрытое поле со скидкой для JS скрипта корзины -->
+                        <!-- Скрытые поля -->
                         <span class='card__price--discount' style='display:none;'>{$formatted_price}</span>
+                        <input type='hidden' class='card__available' value='{$available}'>
                         
                         <button type='button' class='btn-details' onclick=\"window.location.href='product.php?id={$row['id']}'\">ПОДРОБНЕЕ →</button>
-                        <button type='button' class='btn-add-cart card__add'>В КОРЗИНУ 🛒</button>
+                        <button type='button' class='btn-add-cart card__add' {$disabled}>{$btnText}</button>
                     </div>";
                 }
             } else {
